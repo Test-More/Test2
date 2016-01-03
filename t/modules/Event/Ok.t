@@ -48,11 +48,7 @@ tests Failing => sub {
     is($ok->name, 'the_test', "got name");
     is($ok->effective_pass, 0, "effective pass");
 
-    is(
-        $ok->default_diag,
-        "Failed test 'the_test'\nat foo.t line 42.",
-        "default diag"
-    );
+    ok(!$ok->diag, "no default diag");
 
     my $state = Test2::Hub::State->new;
     $ok->update_state($state);
@@ -68,8 +64,8 @@ tests fail_with_diag => sub {
         trace => $trace,
         pass  => 0,
         name  => 'the_test',
-        diag  => ['xxx'],
     );
+    $ok->set_diag(['xxx']),
     is($ok->pass, 0, "got pass");
     is($ok->name, 'the_test', "got name");
     is($ok->effective_pass, 0, "effective pass");
@@ -100,12 +96,7 @@ tests "Failing TODO" => sub {
     is($ok->name, 'the_test', "got name");
     is($ok->effective_pass, 1, "effective pass is true from todo");
 
-    $ok->set_diag([ $ok->default_diag ]);
-    is_deeply(
-        $ok->diag,
-        [ "Failed (TODO) test 'the_test'\nat foo.t line 42." ],
-        "Got diag"
-    );
+    ok(!$ok->diag, "no default diag");
 
     my $state = Test2::Hub::State->new;
     $ok->update_state($state);
@@ -148,17 +139,6 @@ tests init => sub {
         allow_bad_name => 1,
     );
     ok($ok, "allowed the bad name");
-};
-
-tests default_diag => sub {
-    my $ok = Test2::Event::Ok->new(trace => $trace, pass => 1);
-    is_deeply([$ok->default_diag], [], "no diag for a pass");
-
-    $ok = Test2::Event::Ok->new(trace => $trace, pass => 0);
-    like($ok->default_diag, qr/Failed test at foo\.t line 42/, "got diag w/o name");
-
-    $ok = Test2::Event::Ok->new(trace => $trace, pass => 0, name => 'foo');
-    like($ok->default_diag, qr/Failed test 'foo'\nat foo\.t line 42/, "got diag w/name");
 };
 
 done_testing;

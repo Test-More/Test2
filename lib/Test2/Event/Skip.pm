@@ -11,6 +11,13 @@ sub init {
     $self->{+EFFECTIVE_PASS} = 1;
 }
 
+sub set_todo {
+    my $self = shift;
+    my ($todo) = @_;
+    $self->SUPER::set_todo($todo);
+    $self->{+EFFECTIVE_PASS} = 1;
+}
+
 sub update_state { $_[1]->bump(1) }
 
 sub causes_fail { 0 }
